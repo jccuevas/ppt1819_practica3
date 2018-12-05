@@ -32,12 +32,31 @@ public class HttpConnection implements Runnable{
             System.out.println("Starting new HTTP connection with "+socket.getInetAddress().toString());
             dos = new DataOutputStream(socket.getOutputStream());
             //dos.write("200 OK".getBytes());
-            dos.write("Hello".getBytes());
-            dos.flush();
             BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String line = bis.readLine();
-            dos.write(("ECO "+line).getBytes());
+            System.out.println("SERVER ["+socket.getInetAddress().toString()+"] received>"+line);
+            String response="HTTP/1.1 200 OK\r\nContent-type:text/html\r\nConten-length:39\r\n\r\n";
+            String entity="<html><body><h1>HOLA</h1></body></html>";
+            try{
+            analizeRequest(line);
+            
+            
+            
+            }catch(HttpException400 ex400){
+            }
+            catch(HttpException405 ex405){
+                System.err.println(ex405.getMessage());
+                response="HTTP/1.1 405 METHOD NOT SUPPORTED\r\nContent-type:text/html\r\nConten-length:38\r\n\r\n";
+                entity="<html><body><h1>405</h1></body></html>";
+            }
+            catch(HttpException505 ex505){
+            }
+            
+            dos.write(response.getBytes());
             dos.flush();
+            dos.write(entity.getBytes());
+            dos.flush();
+            
         } catch (IOException ex) {
             Logger.getLogger(HttpConnection.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -50,5 +69,17 @@ public class HttpConnection implements Runnable{
         }
         
     }
+    
+    protected int analizeRequest(String request)throws HttpException400,HttpException405,HttpException505{
+    
+        if(!request.startsWith("GET ")) throw new HttpException405();
+    
+        return 200;
+    }
+    
+    public class HttpException400 extends IOException{}
+    public class HttpException404 extends IOException{}
+    public class HttpException405 extends IOException{}
+    public class HttpException505 extends IOException{}
     
 }
