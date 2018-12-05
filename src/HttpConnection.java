@@ -38,9 +38,9 @@ public class HttpConnection implements Runnable{
             String response="HTTP/1.1 200 OK\r\nContent-type:text/html\r\nConten-length:39\r\n\r\n";
             String entity="<html><body><h1>HOLA</h1></body></html>";
             try{
-            analizeRequest(line);
+            String path= analizeRequest(line);
             
-            
+            entity= readEntity(path);
             
             }catch(HttpException400 ex400){
             }
@@ -51,12 +51,13 @@ public class HttpConnection implements Runnable{
             }
             catch(HttpException505 ex505){
             }
+            finally{
             
             dos.write(response.getBytes());
             dos.flush();
             dos.write(entity.getBytes());
             dos.flush();
-            
+            }
         } catch (IOException ex) {
             Logger.getLogger(HttpConnection.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -70,11 +71,18 @@ public class HttpConnection implements Runnable{
         
     }
     
-    protected int analizeRequest(String request)throws HttpException400,HttpException405,HttpException505{
+    protected String analizeRequest(String request)throws HttpException400,HttpException405,HttpException505{
     
         if(!request.startsWith("GET ")) throw new HttpException405();
     
-        return 200;
+        return "/";
+    }
+
+    private String readEntity(String path) throws HttpException404{
+        //Leer del fichero
+        
+        return "<html><body><h1>405</h1></body></html>";
+        
     }
     
     public class HttpException400 extends IOException{}
