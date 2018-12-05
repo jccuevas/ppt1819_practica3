@@ -70,7 +70,14 @@ public class HttpConnection implements Runnable{
         }
         
     }
-    
+    /**
+     * Este método analiza la lína de petición de HTTP/1.1
+     * @param request
+     * @return la ruta al recurso a enviar al cliente
+     * @throws HttpConnection.HttpException400
+     * @throws HttpConnection.HttpException405
+     * @throws HttpConnection.HttpException505 
+     */
     protected String analizeRequest(String request)throws HttpException400,HttpException405,HttpException505{
     
         if(!request.startsWith("GET ")) throw new HttpException405();
